@@ -30,12 +30,18 @@ factorial:
   decl %eax # decrement the number i.e. if 5 then 4 (n-1)
   push %eax # push  (n-1) into the stackframe
   call factorial
+  addl $4, %esp # cleaningup the stack parameters since function has returned
 
-  movl %eax,%ebx # value is return to %eax after function ends
-  movl 8(%ebp),%eax # the original parameter
+  movl 8(%ebp),%ebx # the original parameter, since after a function call (%esp & %ebp are preserved)
   imull %ebx,%eax # multiply (n-1)*n
 
 end_factorial:
   movl %ebp, %esp # restoring %esp and %ebp (%esp varies , %ebp remains same)
   pop %ebp # (pops the return value too) pop operation as it was pushed in  line 22
-  ret
+  ret # jumps to the return address (which was pushed when calling the function)
+
+#################################
+# | $4 <-- 8(%ebp)
+# | return address <-- 4(%ebp)
+# | old %ebp <-- %ebp,%esp
+#################################
