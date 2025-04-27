@@ -93,7 +93,7 @@ read_loop_begin:
 
   movl $BUFFER_SIZE, %edx # the size of the buffer
 
-  int $LINUX_SYSCALL # interrupt syscall
+  int $LINUX_SYSCALL # invoke syscall
 
   cmpl $END_OF_FILE, %eax  # checking if we've reached the EOF
 
@@ -169,7 +169,7 @@ convert_to_upper:
   je end_convert_loop # exit the conversion loop
 
 convert_loop:
-  movb (%eax,%edi,1), %cl # movb moves a single byte
+  movb (%eax,%edi,1), %cl # movb moves a single byte | start at %eax and go %edi locations forward with each location being 1 byte big
 
 # go to the next byte unless it is between 'a' and 'z'
   cmpb $LOWERCASE_A, %cl
@@ -193,3 +193,13 @@ end_convert_loop:
   movl %ebp, %esp
   pop %ebp
   ret
+#######################
+# Reading and writing files in UNIX
+# the `open` syscall is what handles this
+# it takes following paramters
+# %eax -> syscall number i.e. 5 | open | https://www.chromium.org/chromium-os/developer-library/reference/linux-constants/syscalls/#i686_5
+# %ebx -> pointer to a string that is the name of the file to open 
+# %ecx -> mode with which to open the file | read-only, write-only, read&write
+# %edx -> contains the permission that are used to open the file| used incase the file has to be created first, so the linux kernel know what permission to create the file with
+# %eax -> after the syscall the fd(file descriptor) of the opened-file is stored in %eax register 
+#######################
